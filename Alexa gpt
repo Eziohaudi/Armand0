@@ -1,0 +1,43 @@
+import openai
+import logging
+import os
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Configura la clave API de OpenAI
+openai.api_key = os.environ['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']
+
+def lambda_handler(event, context):
+    # Obtiene el texto de entrada de la solicitud de Alexa
+    input_text = event['request']['intent']['slots']['input_text']['value']
+    
+    # Configura el modelo de GPT-3
+    model_engine = "davinci"
+    
+    # Envía la solicitud a la API de GPT-3 y obtiene la respuesta
+    response = openai.Completion.create(
+        engine=model_engine,
+        prompt=input_text,
+        max_tokens=100,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+    
+    # Obtiene la respuesta de GPT-3
+    output_text = response.choices[0].text
+    
+    # Crea la respuesta para Alexa
+    response = {
+        'version': '1.0',
+        'response': {
+            'outputSpeech': {
+                'type': 'PlainText',
+                'text': output_text
+            },
+            'shouldEndSession': True
+        }
+    }
+    
+    return response
